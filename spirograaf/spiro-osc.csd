@@ -12,6 +12,7 @@
 #define FASE #"/csound-spiro/in/fase"#
 #define FASE2 #"/csound-spiro/in/fase2"#
 #define FIGS #"/csound-spiro/in/figs"#
+#define CHANGE #"/csound-spiro/in/change"#
 
 #ifndef OSCSERVER
 #define OSCSERVER #"127.0.0.1"#
@@ -23,13 +24,12 @@
 sr                  =             44100
 kr                  =             1764
 ksmps               =             25
-
 nchnls              =             2
 
 gilisten            OSCinit       7000
 
                     instr         11
-                    OSCsend       1, $OSCSERVER, 9999, "/csound-spiro/out/inputs", "s", "gat,fase,wiel,fase2,figs"
+                    OSCsend       1, $OSCSERVER, 9999, "/csound-spiro/out/inputs", "s", "gat,fase,wiel,fase2,figs,change"
                     endin
                     
 
@@ -79,7 +79,7 @@ kans4               OSClisten     gilisten, $FASE2, "f", kfase2
                     kgoto         next4  ;Process all events in queue
 done4:
 
-kfigs               init          0.5
+kfigs               init          0.3
 next5:
 kans5               OSClisten     gilisten, $FIGS, "f", kfigs
                     if (kans5 == 0) goto done5
@@ -138,7 +138,7 @@ done3:
 iringidx            init          p4
 iring               table         iringidx, 6
 ifig                init          p5
-iaantalwielen       init          p6
+iaantalwielen        init          p6
 iamp                init          32000
 irr                 init          3.05
 kcnt                init          0
@@ -148,7 +148,7 @@ kcnt                =             kcnt + 1
 kwielidx            table         ktblidx, ifig
 kgat1               table         ktblidx, ifig + 1
 kfase1              table         ktblidx, ifig + 2
-kwiel               table         kwielidx, 3
+kwiel                table          kwielidx, 3
 krondjes            table         kwielidx, iringidx + 4
 kfreq               =             ifreq * krondjes
 kwr                 =             kwiel / iring
@@ -163,6 +163,39 @@ a2                  table         afase2, 1, 1, 0, 1
 a3                  table         afase1, 2, 1, 0, 1
 a4                  table         afase2, 2, 1, 0, 1
                     outs          iamp * (a1 * ka + a2 * kb), iamp * (a3 * ka + a4 * kb)
+                    endin
+
+                    instr         3
+kchange             init          0
+kidx                init          0
+kins                init          0
+kring               init          0
+kfig                init          0
+kaant               init          0
+kfactor             init          0
+
+next1:
+kans1               OSClisten     gilisten, $CHANGE, "f", kchange
+                    if (kans1 == 0) goto done1
+                    if (kchange == 0) goto done1
+                    printks       "change = %f\\n", 0, kchange
+                    printks       "idx = %f\\n", 0, kidx
+kins                table         kidx, 100
+                    printks       "ins = %f\\n", 0, kins
+kring               table         kidx, 101
+                    printks       "ring = %f\\n", 0, kring
+kfig                table         kidx, 102
+                    printks       "fig = %f\\n", 0, kfig
+kaant               table         kidx, 103
+                    printks       "aant = %f\\n", 0, kaant
+kfactor             table         kidx, 104
+                    printks       "factor = %f\\n", 0, kfactor
+kidx                =             (kidx + 1) % 7
+                    turnoff2      1, 0, 1
+                    turnoff2      2, 0, 1
+                    event         "i", kins, 0, -1, kring, kfig, kaant, kfactor
+                    kgoto         next1  ;Process all events in queue
+done1:
                     endin
 </CsInstruments>
 <CsScore>
@@ -218,31 +251,43 @@ f 23 0 8 -2    1    2    3    2    3    4    5    4    5
 ; fases
 f 24 0 8 -2    0  0.5    1 -0.5   -1  1.5    2 -1.5    2
 
+; instrument
+f 100 0 16 -2   1   1   2   2   2   2   2
+; ring
+f 101 0 16 -2   0   1   1   1   0   1   1
+; fig
+f 102 0 16 -2   0   0  10  13  16  19  22
+; aant
+f 103 0 16 -2   0   0   4  12  24  15   9
+; factor
+f 104 0 16 -2   0   0  10   1   1   1   1
+
 i 11 0 .1
+i 3 0 10000
+i 2 0 -1    1  22    9      1
 ; 10000 keer herhalen
-r 100
+;r 10000
 ; een wiel
 ;ins start dur ring
-i 1      0   30    0
-i 1      +   .    1
+;i 1      0  30    0
+;i 1      +   .    1
 ; vaste figuren
 ;ins start dur ring fig aant factor
-i 2      61  5    1  10    4      9
-i 2      +   .    1  13   12      9
-i 2      +   .    0  16   24      9
-i 2      +   .    1  19   15      9
-i 2      +   .    1  22    9      9
-s
+;i 2     60   5    1  10    4      10
+;i 2      +   .    1  13   12      1
+;i 2      +   .    0  16   24      1
+;i 2      +   .    1  19   15      1
+;i 2      +   .    1  22    9      1
+;s
 e
 </CsScore>
-</CsoundSynthesizer>
-<bsbPanel>
+</CsoundSynthesizer><bsbPanel>
  <label>Widgets</label>
  <objectName/>
- <x>0</x>
- <y>0</y>
- <width>505</width>
- <height>505</height>
+ <x>836</x>
+ <y>57</y>
+ <width>442</width>
+ <height>670</height>
  <visible>true</visible>
  <uuid/>
  <bgcolor mode="nobackground">
@@ -259,7 +304,7 @@ e
   <uuid>{eac85a7f-099e-4aa8-b9ce-3757c1217596}</uuid>
   <visible>true</visible>
   <midichan>0</midichan>
-  <midicc>0</midicc>
+  <midicc>-3</midicc>
   <value>-255.00000000</value>
   <type>lissajou</type>
   <zoomx>2.20000000</zoomx>
@@ -282,6 +327,7 @@ CurrentView: io
 IOViewEdit: On
 Options:
 </MacOptions>
+
 <MacGUI>
 ioView nobackground {59367, 11822, 65535}
 ioGraph {5, 5} {500, 500} lissajou 2.200000 -255 spiro

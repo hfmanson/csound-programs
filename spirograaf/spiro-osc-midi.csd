@@ -29,7 +29,7 @@ gilisten            OSCinit       7000
 
                     instr         11
                     OSCsend       1, $OSCSERVER, 9999, "/csound-spiro/out/inputs", "s", "gat,fase,wiel,fase2,figs"
-                    OSCsend       1, $OSCSERVER, 9999, "/csound-spiro/out/outputs", "s", "cc,pitch"
+                    OSCsend       1, $OSCSERVER, 9999, "/csound-spiro/out/outputs", "s", "cc,pitch,note"
                     endin
                     
 
@@ -67,7 +67,7 @@ kwiel1              init          0
 next3:
 kans3               OSClisten     gilisten, $WIEL, "f", kwiel1
                     if (kans3 == 0) goto done3
-;                    printks      "kwiel1 = %f\\n", 0, 16 * kwiel1
+                    printks      "kwiel1 = %f\\n", 0, 100 * kwiel1
                     kgoto         next3  ;Process all events in queue
 done3:
 
@@ -87,9 +87,9 @@ kans5               OSClisten     gilisten, $FIGS, "f", kfigs
                     kgoto         next5  ;Process all events in queue
 done5:
 
-
-kwiel               table         16 * kwiel1, 3
-krondjes            table         16 * kwiel1, iringidx + 4
+kwiel2              =             round(100 * kwiel1) % 16
+kwiel               table         kwiel2, 3
+krondjes            table         kwiel2, iringidx + 4
 
 kfreq               =             ifreq * krondjes
 kwr                 =             kwiel / iring
@@ -166,9 +166,27 @@ a4                  table         afase2, 2, 1, 0, 1
                     endin
                     
                     instr         130
+knotelength         init          0
+knoteontime         init          0
+                    massign       0, 0
 kstatus, kchan, kdata1, kdata2    midiin
 
-                    if (kstatus == 176) then
+                    if (kstatus == 128) then
+knoteofftime        times
+knotelength         =             (knoteofftime - knoteontime) * 1000
+                    printks        "Note Off: chan = %d note#  = %d velocity = %d length = %d\\n", 0, kchan, kdata1,kdata2, knotelength
+                    elseif (kstatus == 144) then
+                    if (kdata2 == 0) then
+knoteofftime        times
+knotelength         =             (knoteofftime - knoteontime) * 1000
+                    printk2       knotelength
+                    printks       "Note Off: chan = %d note#  = %d velocity = %d length = %d\\n", 0, kchan, kdata1, kdata2, knotelength
+                    else
+                    printks       "Note On: chan = %d note#  = %d velocity = %d\\n", 0, kchan, kdata1, kdata2
+knoteontime         times
+                    OSCsend       kdata1, $OSCSERVER, 9999, "/csound-spiro/out/note", "f", (kdata1 / 100.0)
+                    endif
+                    elseif (kstatus == 176) then
                     printks       "kchan = %d, \\t ( data1 , kdata2 ) = ( %d, %f )\\tPitch Bend\\n", 0, kchan, kdata1, kdata2/128.0
                     OSCsend       kdata2, $OSCSERVER, 9999, "/csound-spiro/out/cc", "f", (kdata2 / 128.0)
                     elseif (kstatus == 224) then
