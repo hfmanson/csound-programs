@@ -175,15 +175,15 @@ kstatus, kchan, kdata1, kdata2    midiin
                     if (kstatus == 128) then
 knoteofftime        times
 knotelength         =             (knoteofftime - knoteontime) * 1000
-                    printks        "Note Off: chan = %d note#  = %d velocity = %d length = %d\\n", 0, kchan, kdata1,kdata2, knotelength
+                    printks        "Note Off: chan = %f note#  = %f velocity = %f length = %f\\n", 0, kchan, kdata1,kdata2, knotelength
                     elseif (kstatus == 144) then
                     if (kdata2 == 0) then
 knoteofftime        times
 knotelength         =             (knoteofftime - knoteontime) * 1000
                     printk2       knotelength
-                    printks       "Note Off: chan = %d note#  = %d velocity = %d length = %d\\n", 0, kchan, kdata1, kdata2, knotelength
+                    printks       "Note Off: chan = %f note#  = %f velocity = %f length = %f\\n", 0, kchan, kdata1, kdata2, knotelength
                     else
-                    printks       "Note On: chan = %d note#  = %d velocity = %d\\n", 0, kchan, kdata1, kdata2
+                    printks       "Note On: chan = %f note#  = %f velocity = %f\\n", 0, kchan, kdata1, kdata2
 knoteontime         times
                     OSCsend       kdata1, $OSCSERVER, 9999, "/csound-spiro/out/note", "f", (kdata1 / 100.0)
                     endif
