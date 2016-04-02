@@ -281,7 +281,8 @@ i 2 0 -1    1  22    9      1
 ;s
 e
 </CsScore>
-</CsoundSynthesizer><bsbPanel>
+</CsoundSynthesizer>
+<bsbPanel>
  <label>Widgets</label>
  <objectName/>
  <x>836</x>
@@ -327,7 +328,6 @@ CurrentView: io
 IOViewEdit: On
 Options:
 </MacOptions>
-
 <MacGUI>
 ioView nobackground {59367, 11822, 65535}
 ioGraph {5, 5} {500, 500} lissajou 2.200000 -255 spiro

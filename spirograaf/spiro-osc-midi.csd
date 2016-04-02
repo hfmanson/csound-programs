@@ -29,7 +29,8 @@ gilisten            OSCinit       7000
 
                     instr         11
                     OSCsend       1, $OSCSERVER, 9999, "/csound-spiro/out/inputs", "s", "gat,fase,wiel,fase2,figs"
-                    OSCsend       1, $OSCSERVER, 9999, "/csound-spiro/out/outputs", "s", "cc,pitch,note"
+                    OSCsend       1, $OSCSERVER, 9999, "/csound-spiro/out/outputs", "s", "cc1,cc2,pitch,note"
+                    turnon        130
                     endin
                     
 
@@ -187,10 +188,15 @@ knoteontime         times
                     OSCsend       kdata1, $OSCSERVER, 9999, "/csound-spiro/out/note", "f", (kdata1 / 100.0)
                     endif
                     elseif (kstatus == 176) then
-                    printks       "kchan = %d, \\t ( data1 , kdata2 ) = ( %d, %f )\\tPitch Bend\\n", 0, kchan, kdata1, kdata2/128.0
-                    OSCsend       kdata2, $OSCSERVER, 9999, "/csound-spiro/out/cc", "f", (kdata2 / 128.0)
+                    if (kdata1 == 1) then
+                    printks       "kchan = %f, \\t ( data1 , kdata2 ) = ( %f, %f )\\tcc1\\n", 0, kchan, kdata1, kdata2/128.0
+                    OSCsend       kdata2, $OSCSERVER, 9999, "/csound-spiro/out/cc1", "f", (kdata2 / 128.0)
+                    else
+                    printks       "kchan = %f, \\t ( data1 , kdata2 ) = ( %f, %f )\\tcc2\\n", 0, kchan, kdata1, kdata2/128.0
+                    OSCsend       kdata2, $OSCSERVER, 9999, "/csound-spiro/out/cc2", "f", (kdata2 / 128.0)
+                    endif
                     elseif (kstatus == 224) then
-                    printks       "kchan = %d, \\t ( data1 , kdata2 ) = ( %d, %f )\\tPitch Bend\\n", 0, kchan, kdata1, kdata2/128.0
+                    printks       "kchan = %f, \\t ( data1 , kdata2 ) = ( %f, %f )\\tPitch Bend\\n", 0, kchan, kdata1, kdata2/128.0
                     OSCsend       kdata2, $OSCSERVER, 9999, "/csound-spiro/out/pitch", "f", (kdata2 / 128.0)
 
                     endif
@@ -250,7 +256,6 @@ f 23 0 8 -2    1    2    3    2    3    4    5    4    5
 f 24 0 8 -2    0  0.5    1 -0.5   -1  1.5    2 -1.5    2
 
 i 11 0 .1
-i 130 0 3600
 
 ; 10000 keer herhalen
 ;r 100
@@ -283,7 +288,7 @@ e
   <g>46</g>
   <b>255</b>
  </bgcolor>
- <bsbObject version="2" type="BSBScope">
+ <bsbObject type="BSBScope" version="2">
   <objectName>spiro</objectName>
   <x>5</x>
   <y>5</y>
@@ -304,17 +309,6 @@ e
 </bsbPanel>
 <bsbPresets>
 </bsbPresets>
-<MacOptions>
-Version: 3
-Render: Real
-Ask: Yes
-Functions: ioObject
-Listing: Window
-WindowBounds: 836 57 442 670
-CurrentView: io
-IOViewEdit: On
-Options:
-</MacOptions>
 <MacGUI>
 ioView nobackground {59367, 11822, 65535}
 ioGraph {5, 5} {500, 500} lissajou 2.200000 -255 spiro
