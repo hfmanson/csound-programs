@@ -2,7 +2,7 @@
 <CsOptions>
 ; Select audio/midi flags here according to platform
 ; Audio out   Audio in
--odac           -iadc    ;;;RT audio I/O
+-odac              ;;;RT audio I/O
 ; For Non-realtime ouput leave only the line below:
 ; -o gen10.wav -W ;;; for file output any platform
 </CsOptions>
@@ -309,7 +309,3 @@ e
 </bsbPanel>
 <bsbPresets>
 </bsbPresets>
-<MacGUI>
-ioView nobackground {59367, 11822, 65535}
-ioGraph {5, 5} {500, 500} lissajou 2.200000 -255 spiro
-</MacGUI>
